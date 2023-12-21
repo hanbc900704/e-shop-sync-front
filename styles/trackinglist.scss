@@ -1,0 +1,141 @@
+.custom-select-menu .group {
+  min-width: 160px;
+  left: 0;
+}
+
+.house-cmte:hover>.house-btns {
+  display: flex;
+}
+
+.disabled-link .i-mdi-link{
+  color: #00000036;
+}
+
+
+/* web report */
+.webreport_container {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  max-width: 800px;
+  margin: 20px auto;
+  border: 1px solid #ddd;
+  padding: 20px;
+}
+
+.webreport_header, .webreport_footer {
+  padding: 10px;
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+}
+
+.webreport_logo {
+  float: left;
+  width: 100px;
+  height: 50px;
+  background-color: #ccc; /* Placeholder for the logo */
+}
+
+.webreport_firm-name {
+  float: right;
+  font-size: 12px;
+  text-align: right;
+  padding-top: 5px;
+}
+
+.webreport_client-details {
+  margin-left: 120px; /* Assuming logo width plus some padding */
+  margin-bottom: 10px;
+}
+
+.webreport_client-details h1,
+.webreport_client-details p {
+  margin: 0;
+  padding: 0;
+  line-height: 1.4;
+}
+
+.webreport_client-name {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.webreport_report-title {
+  font-size: 18px;
+  color: #555;
+}
+
+.webreport_session-info,
+.webreport_date-time {
+  font-size: 14px;
+  color: #777;
+}
+
+.webreport_content-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 30px;
+}
+
+.webreport_content-list {
+  list-style-type: none;
+  padding: 0;
+  font-size: 14px;
+}
+
+.webreport_article-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 20px 0;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #ddd;
+}
+
+.webreport_article-body {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.webreport_section {
+  margin-top: 10px;
+}
+
+.webreport_footer {
+  font-size: 12px;
+  border-top: 1px solid #ddd; /* If there's a footer separator */
+  text-align: center;
+  clear: both;
+}
+
+/* Clear float */
+.webreport_clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* Notes style */
+.webreport_notes {
+  font-size: 12px;
+  color: #666;
+  margin-top: 20px;
+  border-top: 1px dashed #ddd;
+  padding-top: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .webreport_header, .webreport_footer {
+    text-align: center;
+  }
+
+  .webreport_logo,
+  .webreport_firm-name {
+    float: none;
+    display: inline-block;
+    margin: 0 auto;
+  }
+
+  .webreport_client-details {
+    margin-left: 0;
+  }
+}

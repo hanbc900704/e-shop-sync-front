@@ -1,0 +1,165 @@
+<template>
+    <div>
+        <div v-if="!addState" class="flex w-full cursor-pointer items-center justify-center rounded-[8px] bg-[#E9E9E9] py-[12px] active:translate-x-[1px] active:translate-y-[1px]" @click="addState=true">
+            <img src="/images/document.svg" alt="document" width="20" height="20" />
+            <span class="ht-14 ml-[8px] text-[#000000A0]">New Summary</span> 
+        </div>
+        <section v-show="addState" class="rounded-lg border border-[#cdcdcd] bg-[rgb(0,0,0,0.03)] px-8 py-5">
+            <div class="mb-[12px] flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="mr-[12px] block h-[40px] w-[40px] rounded-full bg-[#FFFFFFA0]">
+                        <img v-if="userData.avatar" :src="userData.avatar" alt="avatar" class="h-full w-full rounded-full object-cover">
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="ht-14">{{ userData.first_name + " " + userData.last_name }}</span>
+                        <span class="ht-14 text-[#00000080]">{{ new Date().toLocaleDateString() }}</span>
+                    </div>
+                </div>
+                <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
+                    <UButton color="white" :label="'To: ' + receiption" trailing-icon="i-heroicons-chevron-down-20-solid" class="flex min-w-[150px] justify-between" />
+                </UDropdown>
+            </div>
+            <hr class="mb-[12px]">
+            <Editor v-model="content" api-key="no-api-key" :init="{
+                    toolbar_mode: 'sliding',
+                    plugins: ['advlist autolink lists link image charmap print preview anchor',
+                            'searchreplace visualblocks code fullscreen',
+                            'insertdatetime media table paste code help wordcount'],
+                    toolbar: 'undo redo | formatselect | bold italic backcolor | \
+                            alignleft aligncenter alignright alignjustify | \
+                            bullist numlist outdent indent | removeformat | help',
+                    menubar: false,
+                }" initial-value="Please describe the Bill Details Summary">
+            </Editor>
+            <div class="mt-5 flex">
+                <UButton class="ml-auto bg-gradient-to-r from-[#757575] to-[#949494]" variant="solid" @click="publishSummary()">Publish</UButton>
+                <UButton class="ml-[24px] bg-gradient-to-r from-[#757575] to-[#949494]" variant="solid" @click="cancelPublishSummary()">Cancel</UButton>
+            </div>
+        </section>
+        
+        <div class="h-divider my-[24px] bg-gray-300"></div>
+
+        <div v-for="item, index in billSummary" :key="index" class="w-full border-b py-[24px]">
+            <BillDetail :display-order="item.displayOrder" :idx="item.id" :sender-name="userData.first_name + '' + userData.last_name" :send-date="item.create_date" :sender-avata="item.avatar" :receiver-name="item.recipient"
+                        :content="item.bill_summary" @publish-summary="(content) => onPublishEdited(content)"
+                        @remove-summary="(idx) => onRemoveSummary(idx)" />
+        </div>
+    </div>
+    
+</template>
+
+<script setup>
+import Editor from '@tinymce/tinymce-vue'
+</script>
+
+<script>
+export default {
+    name: "BillContent",
+    props: {
+        billSummary: {
+            type: Array,   
+            // eslint-disable-next-line vue/require-valid-default-prop
+            default: []
+        },
+        billId: {
+            type: String,
+            default: ''
+        }
+    },
+    emits: ['publishSummary', 'publishEvent'],
+    data() {
+        return {
+            items: [
+                [{
+                    label: 'Everyone',
+                    icon: '',
+                    click: () => {
+                        this.receiption = 'Everyone'
+                    }
+                }]
+            ],
+            addState: false,
+            content: '',
+            receiption: ''
+        }
+    },
+    computed: {
+        apiURL() {
+            const { public: config } = useRuntimeConfig();
+            return config.BACKEND_API_URL;
+        },
+        billID() {
+            return this.$route.params.id
+        },
+        userData() {
+            const userData = useCookie('userData'); // get token from cookies
+            // console.log(userData.value)
+            return userData.value
+        }
+    },
+    created() {
+        console.log('this.billSummary inside', this.billSummary)
+    },
+    methods: {
+        publishSummary() {
+            const contents = {
+                bill_summary: this.content,
+                recipient: 'Everyone',
+                display_order: this.billSummary.length + 1,
+                app_user_id: this.userData.app_user_id || 1
+            }
+            this.$emit("publishSummary", contents)
+            this.addState = false;
+        },
+        cancelPublishSummary() {
+            this.content = "";
+            this.addState = false;
+        },
+        async onPublishEdited(content) {
+            const updated = content;
+            updated.app_user_id = this.userData.app_user_id || 1
+            updated.bill_id = this.billID;
+
+            try {
+                // Fetch data from the specified URL using the ID
+                this.$toast.info('Publishing Bill Summary', {
+					position: 'top-right'
+				});
+                await $fetch(`${this.apiURL}/bill_summary`, {
+                // await $fetch(`http://localhost:8000/python/bill_summary`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updated)
+                });
+                this.$toast.success('Bill Summary Updated Successfully', {
+					position: 'top-right'
+				});
+            } catch (error) {
+                // Handle errors, if any
+                console.error('An error occurred while fetching summary:', error);
+            }
+
+            this.$emit('publishEvent')
+
+        },
+        async onRemoveSummary(idx) {
+            try {
+                // Fetch data from the specified URL using the ID
+                await fetch(`${this.apiURL}/bill_summary/${idx}`, {
+                    method: 'DELETE'
+                });
+                this.$toast.success('Bill Summary Deleted Successfully', {
+					position: 'top-right'
+				});
+                // Store the fetched data in the 'detailDocument.info' property
+            } catch (error) {
+                // Handle errors, if any
+                console.error('An error occurred while fetching summary:', error);
+            }
+            this.$emit('publishEvent')
+        }
+    },
+}
+</script>

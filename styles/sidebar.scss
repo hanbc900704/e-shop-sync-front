@@ -1,0 +1,17 @@
+body {
+    background-color: #FFFFFF;
+}
+.sidebar.scrollbar {
+    background-color: rgba(29, 41, 57, 1);
+    border-right: 1px solid #E1E0E1;
+}
+
+.sidebar .navbar-item {
+    color: rgba(152, 162, 179, 1);
+}
+
+.sidebar .router-link-active.router-link-exact-active .navbar-item,
+.sidebar .active .navbar-item {
+    background-color: rgba(16, 24, 40, 1);
+    color: white;
+}
