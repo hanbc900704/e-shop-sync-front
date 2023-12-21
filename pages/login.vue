@@ -2,10 +2,6 @@
 	<div class="flex justify-center h-screen w-full">
 		<div class="flex flex-col items-start justify-center px-[120px] py-[80px]">
 			<div class="m-auto">
-				<div class=" w-full">
-					<img alt="logo" src="/images/logo/logo_skywolf_dark.svg"
-						class="mx-auto transform -translate-y-12 h-auto w-[360px] object-cover" />
-				</div>
 				<div class="w-full">
 					<div class="mb-[42px]">
 						<h2 class="font-[36px] font-semibold text-[#1D2939] text-center">Let's get to work</h2>

@@ -7,13 +7,15 @@ let store;
 
 const index = import('@/store/index');
 const auth0 = import('@/store/auth0');
+const db = import('@/store/db');
 
 export default defineNuxtPlugin(async (nuxtApp) => {
     if (!store) {
         store = createStore({
             ...(await index),
             modules: {
-                auth0: await auth0
+                auth0: await auth0,
+                db: await db,
             }
         });
     }

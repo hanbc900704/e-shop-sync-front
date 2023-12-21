@@ -28,8 +28,7 @@ export const actions = {
         const { public: config } = useRuntimeConfig();
         const urlPrefix = config.BACKEND_API_URL;
         try {
-            const response = await $fetch(`${urlPrefix}/auth/login`, {
-            // const response = await $fetch(`http://localhost:8000/python/auth/login`, {
+            const response = await $fetch(`${urlPrefix}auth/login`, {
                 method: 'post',
                 headers: { 'Content-Type': 'application/json' },
                 body: {

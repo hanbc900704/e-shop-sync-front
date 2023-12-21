@@ -10,8 +10,11 @@
 
 <script>
 export default {
-    setup() {
-        
-    },
+    name: "Resources",
+    data() {
+        return {
+            
+        }
+    }
 }
 </script>
