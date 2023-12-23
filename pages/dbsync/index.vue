@@ -19,7 +19,7 @@
                     <CommonAccordion ref="catalog-select-wrapper" :content="allCatagories" :multiple=true :select-all=selected />
                 </UContainer>
             </div>
-            <div class="flex basis-3/12 flex-col pl-[24px]">
+            <div class="fixed right-[40px] top-[100px] flex min-w-[400px] basis-3/12 flex-col pl-[24px]">
                 <UContainer class="flex flex-col">
                     <div class="flex flex-col pt-[24px]">
                         <label class="mb-[12px]">Step1: Construct Original Data</label>
@@ -63,6 +63,7 @@
 
                 <UContainer class="flex w-full flex-col py-[24px]">
                     <UProgress v-show="syncStatus" animation="carousel"/>
+
                     <label class="my-[12px]">Current Sync Progress</label>
                     <UProgress indicator :value="curPercent" class="w-full" />
                     <label class="mb-[12px]">Entire Progress</label>
@@ -83,6 +84,9 @@ export default {
         }
     },
     computed: {
+        currentStuffType() {
+            return this.$store.getters.currentStuffType;
+        },
         dbConstructStatus() {
             return this.$store.getters.status;
         },
@@ -200,10 +204,12 @@ export default {
     },
     methods: {
         async timer() {
-            await this.$store.dispatch("syncCurrentProgress")
+            if (this.currentStuffType === "db-sync") {
+                await this.$store.dispatch("syncCurrentProgress")
+            }
         },
         async syncProcess() {
-            let selectedlists = [];
+            const selectedlists = [];
 
             const elements = document.getElementsByClassName("catalog-select-checkbox");
             Array.from(elements).forEach(item => {
@@ -222,7 +228,7 @@ export default {
             }
 
             try {
-                await this.$store.dispatch("startDBSync", {list: selectedlists});
+                await this.$store.dispatch("startDBSync", {list: selectedlists, type: 'db-sync'});
             } catch (err) {
                 this.$toast.error("Error Occurred during the Process" + err)
             }

@@ -1,4 +1,5 @@
 export const state = () => ({
+    currentStuffType: '',
     status: false,
     database: [],
     currentProgress: 0,
@@ -12,9 +13,18 @@ export const state = () => ({
     categoryTreeStatus: false,
     filterParamStatus: false,
     productSyncStatus: false,
+    rscCurrentProgress: 0,
+    rscTotalProgress: 0,
+    rscCurrentCategoryList: [],
+    rscTotalCategoryList: [],
+    rscCurrentStuffProgress: 0,
+    rscTotalStuffProgress: 0,
 })
 
 export const getters = {
+    currentStuffType(state) {
+        return state.currentStuffType;
+    },
     status(state) {
         return state.status;
     },
@@ -54,9 +64,30 @@ export const getters = {
     productSyncStatus(state) {
         return state.productSyncStatus;
     },
+    rscCurrentProgress(state) {
+        return state.rscCurrentProgress;
+    },
+    rscTotalProgress(state) {
+        return state.rscTotalProgress;
+    },
+    rscCurrentCategoryList(state) {
+        return state.rscCurrentCategoryList;
+    },
+    rscTotalCategoryList(state) {
+        return state.rscTotalCategoryList;
+    },
+    rscCurrentStuffProgress(state) {
+        return state.rscCurrentStuffProgress;
+    },
+    rscTotalStuffProgress(state) {
+        return state.rscTotalStuffProgress;
+    },
 }
 
 export const mutations = {
+    setCurrentStuffType(state, payload) {
+        state.currentStuffType = payload
+    },
     setStatus(state, payload) {
         state.status = payload;
     },
@@ -107,7 +138,25 @@ export const mutations = {
         state.categoryTreeStatus = false;
         state.filterParamStatus = false;
         state.productSyncStatus = false;
-   },
+    },
+    setRscCurrentProgress(state, payload) {
+        state.rscCurrentProgress = payload
+    },
+    setRscTotalProgress(state, payload) {
+        state.rscTotalProgress = payload
+    },
+    setRscCurrentCategoryList(state, payload) {
+        state.rscCurrentCategoryList = payload
+    },
+    setRscTotalCategoryList(state, payload) {
+        state.rscTotalCategoryList = payload
+    },
+    setRscCurrentStuffProgress(state, payload) {
+        state.rscCurrentStuffProgress = payload
+    },
+    setRscTotalStuffProgress(state, payload) {
+        state.rscTotalStuffProgress = payload
+    },
 }
 
 export const actions = {
@@ -187,9 +236,45 @@ export const actions = {
             console.error('syncCurrentProgress failed', err)
         }
     },
+    async syncRscInitialProgress(context, payload) {
+        const { commit } = context;
+        // useFetch from nuxt 3
+        const { public: config } = useRuntimeConfig();
+        const urlPrefix = config.SYNC_BACKEND_API_URL;
+        try {
+            const response = await $fetch(`${urlPrefix}status/current-rsc-process`);
+            console.log('syncInitialProgress succeed', response)
+            if (response) {
+                commit('setRscCurProgress', (response?.current_plist || []).length);
+                commit('setRscTotalProgress', (response?.all_plist || []).length);
+                commit('setRscCurProgressList', response?.current_plist || []);
+                commit('setRscTotalProgressList', response?.all_plist || []);
+            }
+        } catch (err) {
+            console.error('syncInitialProgress failed', err)
+        }
+    },
+    async syncRscCurrentProgress(context, payload) {
+        const { commit } = context;
+        // useFetch from nuxt 3
+        const { public: config } = useRuntimeConfig();
+        const urlPrefix = config.SYNC_BACKEND_API_URL;
+        try {
+            const response = await $fetch(`${urlPrefix}status/current-rsc-process`);
+            // console.log('syncCurrentProgress succeed', response)
+            if (response) {
+                commit('setRscCurProgress', (response?.current_plist || []).length);
+                commit('setRscCurProgressList', response?.current_plist || []);
+                commit('setRscCurrentStuffProgress', (response?.cur_slist || []).length);
+                commit('setRscTotalStuffProgress', (response?.tar_slist || []).length);
+            }
+        } catch (err) {
+            console.error('syncCurrentProgress failed', err)
+        }
+    },
     async startDBSync(context, payload) {
         const { commit } = context;
-        const { list } = payload
+        const { list, type } = payload
         // useFetch from nuxt 3
         const { public: config } = useRuntimeConfig();
         const urlPrefix = config.SYNC_BACKEND_API_URL;
@@ -199,10 +284,11 @@ export const actions = {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ list })
+                body: JSON.stringify({ list, type })
             });
             console.log('startDBSync succeed', response)
             if (response) {
+                commit('setCurrentStuffType', type);
                 commit('setSyncStartStatus', true);
             }
         } catch (err) {
@@ -218,6 +304,7 @@ export const actions = {
             const response = await $fetch(`${urlPrefix}operation/pause`);
             console.log('pauseDBSync succeed', response)
             if (response) {
+                commit('setCurrentStuffType', "");
                 commit('setSyncStartStatus', false);
             }
         } catch (err) {
