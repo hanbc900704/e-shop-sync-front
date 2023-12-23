@@ -235,7 +235,7 @@ export const actions = {
                 commit('setOriginDataStatus', true);
             }
         } catch (err) {
-            console.lerror('originDataSyncProcess failed', err)
+            console.error('originDataSyncProcess failed', err)
         }
     },
     async originDataReSync(context, payload) {
@@ -249,7 +249,7 @@ export const actions = {
                 commit('setOriginDataStatus', true);
             }
         } catch (err) {
-            console.lerror('originDataReSyncProcess failed', err)
+            console.error('originDataReSyncProcess failed', err)
         }
     },
     async catagoryTreeSync(context, payload) {
@@ -263,7 +263,7 @@ export const actions = {
                 commit('setCategoryTreeStatus', true);
             }
         } catch (err) {
-            console.lerror('catagoryTreeSyncProcess failed', err)
+            console.error('catagoryTreeSyncProcess failed', err)
         }
     },
     async filterParamSync(context, payload) {
@@ -277,7 +277,7 @@ export const actions = {
                 commit('setFilterParamStatus', true);
             }
         } catch (err) {
-            console.lerror('filterParamSyncProcess failed', err)
+            console.error('filterParamSyncProcess failed', err)
         }
     },
     async removeAll(context, payload) {
@@ -291,7 +291,7 @@ export const actions = {
                 commit('clearAllStatus', true);
             }
         } catch (err) {
-            console.lerror('removeAllProcess failed', err)
+            console.error('removeAllProcess failed', err)
         }
     },
 }

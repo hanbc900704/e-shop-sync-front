@@ -20,7 +20,7 @@
                             />
                             <div class="flex w-full flex-wrap items-center">
                                 <div v-for="cc, idx in ele.sonCatalogList" :key="idx" class="w-[200px] p-[16px]">
-                                    <UCheckbox v-model="checkList[cc?.catalogId]" class="catalog-select-checkbox" :name="cc?.catalogId + ''" :label="cc?.catalogName || ''" />
+                                    <UCheckbox :id="'dbsync-checkbox-' + cc?.catalogId" v-model="checkList[cc?.catalogId]" class="catalog-select-checkbox" :name="cc?.catalogId + ''" :label="cc?.catalogName || ''" />
                                 </div>
                             </div>
                         </div>

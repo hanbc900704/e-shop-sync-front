@@ -104,6 +104,9 @@ export default {
         currentProgress() {
             return this.$store.getters.currentProgress;
         },
+        currentCategoryList() {
+            return this.$store.getters.currentCategoryList
+        },
         totalProgress() {
             return this.$store.getters.totalProgress;
         },
@@ -120,13 +123,13 @@ export default {
             if (this.totalStuffProgress === 0) {
                 return 0;
             }
-            return this.currentStuffProgress / this.totalStuffProgress
+            return this.currentStuffProgress / this.totalStuffProgress * 100
         },
         entirePercent() {
             if (this.totalStuffProgress === 0) {
                 return 0;
             }
-            return this.currentProgress / this.totalProgress
+            return this.currentProgress / this.totalProgress * 100
         },
         allCatagories() {
             if (this.database) {
@@ -148,22 +151,34 @@ export default {
     },
     watch: {
         database(now) {
-            
+            console.log('database', now)
         },
         syncStatus(now) {
             this.disableProcess(!now);
         },
         curPercent(now) {
-            console.log('curPercent', this.curPercent)
+            console.log('curPercent', now)
         },
         entirePercent(now) {
-            console.log('entirePercent', this.entirePercent)
+            console.log('entirePercent', now)
         },
         currentStuffProgress(now) {
-            console.log('currentStuffProgress', this.currentStuffProgress)
+            console.log('currentStuffProgress', now)
         },
         currentProgress(now) {
-            console.log('currentProgress', this.currentProgress)
+            console.log('currentProgress', now)
+        },
+        currentCategoryList(now) {
+            Array.from(now).forEach(item => {
+                const checkBox = document.getElementById(`dbsync-checkbox-${item}`);
+                if (checkBox) {
+                    const parent = checkBox.parentElement.parentElement;
+                    
+                    const lbl = parent.getElementsByTagName('label')
+
+                    parent && lbl.length && (lbl[0].style.color = "#00AE00");
+                }
+            })
         }
     },
     async created() {
@@ -190,21 +205,16 @@ export default {
         async syncProcess() {
             let selectedlists = [];
 
-            if (!this.selected) {
-                const elements = document.getElementsByClassName("catalog-select-checkbox");
-                Array.from(elements).forEach(item => {
-                    const itemCh = item.getElementsByTagName("input")
-                    if (itemCh && itemCh.length > 0) 
-                    {
-                        if (itemCh[0].checked) {
-                            selectedlists.push(itemCh[0].getAttribute("name"))
-                        }
+            const elements = document.getElementsByClassName("catalog-select-checkbox");
+            Array.from(elements).forEach(item => {
+                const itemCh = item.getElementsByTagName("input")
+                if (itemCh && itemCh.length > 0) 
+                {
+                    if (itemCh[0].checked) {
+                        selectedlists.push(itemCh[0].getAttribute("name"))
                     }
-                })
-                console.log(selectedlists)
-            } else {
-                selectedlists = this.totalProgressList;
-            }
+                }
+            })
 
             if (selectedlists.length === 0) {
                 this.$toast.error("Please Select the Items, and Try again!")
