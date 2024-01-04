@@ -92,7 +92,7 @@ export default {
 				this.$toast.success('Login Successfull',{
 					position: 'top-right'
 				})
-				this.router.push('/dbsync');
+				this.router.push('/category');
 			} else {
 				this.$toast.error('Login Failed',{
 					position: 'top-right'

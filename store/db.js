@@ -19,6 +19,7 @@ export const state = () => ({
     rscTotalCategoryList: [],
     rscCurrentStuffProgress: 0,
     rscTotalStuffProgress: 0,
+    productCountList: {}
 })
 
 export const getters = {
@@ -81,6 +82,9 @@ export const getters = {
     },
     rscTotalStuffProgress(state) {
         return state.rscTotalStuffProgress;
+    },
+    productCountList(state) {
+        return state.productCountList;
     },
 }
 
@@ -156,6 +160,9 @@ export const mutations = {
     },
     setRscTotalStuffProgress(state, payload) {
         state.rscTotalStuffProgress = payload
+    },
+    setProductCountList(state, payload) {
+        state.productCountList = payload;
     },
 }
 
@@ -245,10 +252,10 @@ export const actions = {
             const response = await $fetch(`${urlPrefix}status/current-rsc-process`);
             console.log('syncInitialProgress succeed', response)
             if (response) {
-                commit('setRscCurProgress', (response?.current_plist || []).length);
+                commit('setRscCurrentProgress', (response?.current_plist || []).length);
                 commit('setRscTotalProgress', (response?.all_plist || []).length);
-                commit('setRscCurProgressList', response?.current_plist || []);
-                commit('setRscTotalProgressList', response?.all_plist || []);
+                commit('setRscCurrentCategoryList', response?.current_plist || []);
+                commit('setRscTotalCategoryList', response?.all_plist || []);
             }
         } catch (err) {
             console.error('syncInitialProgress failed', err)
@@ -381,4 +388,18 @@ export const actions = {
             console.error('removeAllProcess failed', err)
         }
     },
+    async getCountList(context, payload) {
+        const { commit } = context;
+        const { public: config } = useRuntimeConfig();
+        const urlPrefix = config.SYNC_BACKEND_API_URL;
+        try {
+            const response = await $fetch(`${urlPrefix}data/getAllCount`)
+            console.log('getCountList success', response?.list)
+            if (response) {
+                commit('setProductCountList', response?.list || {});
+            }
+        } catch (err) {
+            console.error('removeAllProcess failed', err)
+        }
+    }
 }

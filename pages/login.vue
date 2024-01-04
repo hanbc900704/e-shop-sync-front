@@ -1,10 +1,10 @@
 <template>
-	<div class="flex justify-center h-screen w-full">
+	<div class="flex h-screen w-full justify-center">
 		<div class="flex flex-col items-start justify-center px-[120px] py-[80px]">
 			<div class="m-auto">
 				<div class="w-full">
 					<div class="mb-[42px]">
-						<h2 class="font-[36px] font-semibold text-[#1D2939] text-center">Let's get to work</h2>
+						<h2 class="text-center font-[36px] font-semibold text-[#1D2939]">Let's get to work</h2>
 					</div>
 					<div class="form flex w-full max-w-[420px] flex-col">
 						<label for="email" class="font-[14px] font-semibold text-[#344054]">Email</label>
@@ -28,7 +28,7 @@
 				</div>
 
 			</div>
-			<div class="flex w-full flex-wrap items-center mt-auto">
+			<div class="mt-auto flex w-full flex-wrap items-center">
 				<span class="mr-[16px] font-[12px] text-[#1D2939]">@ {{ getYear }} CW , Inc.</span>
 				<div class="flex flex-wrap justify-center">
 					<RouterLink to="#" class="font-[12px] text-[#667085]">Privacy</RouterLink>
@@ -81,7 +81,7 @@ export default {
 				this.$toast.success('Login Successfull', {
 					position: 'top-right'
 				})
-				this.router.push('/dbsync');
+				this.router.push('/category');
 			} else {
 				this.$toast.error('Login Failed', {
 					position: 'top-right'

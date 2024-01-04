@@ -24,6 +24,10 @@ export default {
         </div>
 
         <div class="border-b border-[#101828] py-2">
+            <SidebarItem title="Products" to="/category">
+                <SettingsIcon />
+            </SidebarItem>
+
             <SidebarItem title="Database SYNC" to="/dbsync">
                 <ReportsIcon />
             </SidebarItem>

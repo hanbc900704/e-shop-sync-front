@@ -33,7 +33,7 @@
 
 <script>
 export default {
-    name: "CommonAccordion",
+    name: "CommonAccordionItem",
     props: {
         item: {
             type: Object,

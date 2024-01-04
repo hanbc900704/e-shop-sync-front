@@ -21,6 +21,10 @@
             </div>
             <div class="fixed right-[40px] top-[120px] flex min-w-[400px] basis-3/12 flex-col pl-[24px]">
                 <UContainer class="flex w-full flex-col py-[24px]">
+                    <div class="w-full h-[80px] mb-[16px]" v-show="syncStatus">
+                        <img src="/images/filetransfer.gif" alt="gif" class="w-full h-full object-contain" />
+                    </div>
+
                     <UProgress v-show="syncStatus" animation="carousel"/>
 
                     <label class="my-[12px]">Current Sync Progress</label>
@@ -115,6 +119,15 @@ export default {
                     parent && lbl.length && (lbl[0].style.color = "#00AE00");
                 }
             })
+        },
+        async currentStuffProgress(now) {
+            if (now == this.totalStuffProgress) {
+                await this.$store.dispatch("getPreRequest");
+
+                await this.$store.dispatch("constructOriginTree");
+
+                await this.$store.dispatch("updateSyncStatus", false)
+            }
         }
     },
     async created() {

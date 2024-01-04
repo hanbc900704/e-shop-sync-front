@@ -62,6 +62,10 @@
                 <UDivider label="Progress" />
 
                 <UContainer class="flex w-full flex-col py-[24px]">
+                    <div class="w-full h-[80px] mb-[16px]" v-show="syncStatus">
+                        <img src="/images/filetransfer.gif" alt="gif" class="w-full h-full object-contain" />
+                    </div>
+
                     <UProgress v-show="syncStatus" animation="carousel"/>
 
                     <label class="my-[12px]">Current Sync Progress</label>
