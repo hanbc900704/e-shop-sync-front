@@ -225,6 +225,7 @@ export default {
             } else {
                 _url = "D:/" + _url
             }
+            // window.location(_url)
             return _url
         },
         async copyToClipboard(textToCopy) {
