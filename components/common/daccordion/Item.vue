@@ -1,9 +1,9 @@
 <template>
     <div :id="groupId + '-' + item.id" class="accordion-item" :class="{'is-active': active}">
-        <dt class="accordion-item-title mt-6 flex items-center justify-between">
-            <span>{{ item?.title }}</span>
+        <dt class="accordion-item-title relative mt-6 flex items-center justify-between" @click="toggle" >
+            <span>{{ item?.title }} ({{ getWholeCount() }})</span>
             <UButton class="accordion-item-trigger flex items-center justify-between bg-transparent text-black" 
-                icon="i-heroicons-chevron-up" @click="toggle"/>
+                icon="i-heroicons-chevron-up"  />
         </dt>
         <transition
             name="accordion-item"
@@ -15,7 +15,7 @@
                 <div class="accordion-item-details-inner flex w-full flex-col">
                     <UContainer v-for="ele, index in item.childs" :key="index" class="w-full py-[16px]"> 
                         <div class="flex w-full flex-col">
-                            <span class="mb-[8px]">{{ ele?.catalogName }}</span>
+                            <span class="mb-[8px]">{{ ele?.catalogName }} ({{ getSubCount(ele) }})</span>
                             <div class="flex w-full flex-wrap items-center rounded-[8px] p-[24px] shadow-[1px_1px_6px_1px_#00000050]">
                                 <div v-for="cc, idx in ele.sonCatalogList" :key="idx" class="w-[240px] p-[8px]">
                                     <a :href="path + '/' + cc?.catalogId" class="flex flex-col">
@@ -93,6 +93,22 @@ export default {
         endTransition(el) {
             el.style.height = ''
         },
-    }
+        getWholeCount() {
+            let wholeCnt = 0;
+            this.item.childs && Array.from(this.item.childs).forEach(ele => {
+                ele.sonCatalogList.forEach(cc => {
+                    wholeCnt += this.countList[cc?.catalogId];
+                })
+            })
+            return wholeCnt;
+        },
+        getSubCount(ele) {
+            let wholeCnt = 0;
+            ele.sonCatalogList.forEach(cc => {
+                wholeCnt += this.countList[cc?.catalogId];
+            })
+            return wholeCnt;
+        }
+    },
 }
 </script>

@@ -12,7 +12,7 @@
                         </div>
                         <div class="mt-[12px] flex h-full flex-col">
                             <div v-for="item1, index1 in item.parameterValueList" :key="index1" class="pb-[12px]">
-                                <UCheckbox  :name="item1" :label="item1" 
+                                <UCheckbox :name="item1" :label="item1"
                                 />
                             </div>
                         </div>
@@ -152,11 +152,17 @@ export default {
             return config.SYNC_BACKEND_API_URL;
         },
         filteredData() {
-            return this.contents.slice((this.page - 1) * this.pageCount, (this.page) * this.pageCount)
+            // return this.contents.slice((this.page - 1) * this.pageCount, (this.page) * this.pageCount)
+            return this.contents
         },
     },
     watch: {
-        
+        async page(now) {
+            this.loading = true;
+            const response = await $fetch(`${this.apiURL}data/list/${this.param}/${this.pageCount}/${now}`)
+            this.contents = response.list;
+            this.loading = false;
+        }
     },
     async created() {
         await this.fetchProductsByCategoryID();
@@ -166,12 +172,13 @@ export default {
             try {
                 const response = await $fetch(`${this.apiURL}data/list/${this.param}`)
                 this.contents = response.list;
-                this.totalCount = this.contents.length;
+                this.totalCount = response.totalCnt;
+
+                this.loading = false;
 
                 const res = await  $fetch(`${this.apiURL}data/filterParam/${this.param}`)
                 this.paramList = res.list;
 
-                this.loading = false;
             } catch (e) {
                 console.log(e)
             }

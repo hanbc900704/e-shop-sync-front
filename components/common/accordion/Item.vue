@@ -1,9 +1,9 @@
 <template>
     <div :id="groupId + '-' + item.id" class="accordion-item" :class="{'is-active': active}">
-        <dt class="accordion-item-title mt-6 flex items-center justify-between">
-            <UCheckbox v-model="selected" :name="item?.title" :label="item?.title || ''" @change="(e) => mainCheckChanged(e)"/>
+        <dt class="accordion-item-title mt-6 flex items-center justify-between" @click="toggle">
+            <UCheckbox v-model="selected" class="z-10" :name="item?.title" :label="item?.title || ''" @change="(e) => mainCheckChanged(e)"/>
             <UButton class="accordion-item-trigger flex items-center justify-between bg-transparent text-black" 
-                icon="i-heroicons-chevron-up" @click="toggle"/>
+                icon="i-heroicons-chevron-up"  />
         </dt>
         <transition
             name="accordion-item"
