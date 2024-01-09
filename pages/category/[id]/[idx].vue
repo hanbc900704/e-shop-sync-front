@@ -3,7 +3,7 @@
     <div class="flex w-full flex-col">
         <CommonHeader :title="productName" :to="'/category/' + categoryParam"/>
         <hr>
-        <div v-if="loading" class="flex w-full flex-col">
+        <div v-if="loading" class="flex w-full flex-col p-[20px]">
             loading...
         </div>
         <UContainer v-else class="mx-[auto] flex w-full flex-col p-[20px]">
@@ -11,13 +11,13 @@
                 <div class="flex flex-col">
                     <a href="#" @click="copyToClipboard(processToLocalURL(productData.breviaryImageUrl))">
                         <div class="flex h-[200px] w-[200px]">
-                            <img v-if="productData.breviaryImageUrl" :src="processToLocal(productData.breviaryImageUrl)" alt="img" class="h-full w-full object-contain">
+                            <img v-if="productData.breviaryImageUrl" :src="'data:image/jpeg;base64,' + largeImage" alt="img" class="h-full w-full object-contain">
                             <img v-else src="https://static.szlcsc.com/ecp/assets/web/common/images/productItem/lcpt.jpg" alt="img" class="h-full w-full object-contain">
                         </div>
                     </a>
                     <div class="mt-[12px] flex h-[60px] w-[200px]">
-                        <a v-for="item, index in processToImgList(productData.luceneBreviaryImageUrls)" :key="index" href="#" @click="copyToClipboard('D:/' + item)" class="mr-[8px]" >
-                            <img :src="item" alt="img" class="h-[60px] w-[60px] hover:scale-[200%]">
+                        <a v-for="item, index in smallImages" :key="index" href="#" class="mr-[8px]" @click="copyToClipboard('D:/' + item)" >
+                            <img :src="'data:image/jpeg;base64,' + item" alt="img" class="h-[60px] w-[60px] hover:scale-[200%]">
                         </a>
                     </div>
 
@@ -63,7 +63,11 @@
                     <a href="#" @click="copyToClipboard('D:/' + item.url)">
                         <span>{{ item.name }}</span>
                     </a>
-                    <iframe :src="item.url" class="h-[800px] w-full"></iframe>
+                </div>
+                <div v-for="item, index in fetchedPDFList" :key="index" class="flex w-full flex-col py-[24px]">
+                    
+                    <!-- <button @click="openBlob(item.url)">Click</button> -->
+                    <iframe :src="openBlob(item.url)" class="h-[800px] w-full"></iframe>
                 </div>
             </div>
 
@@ -82,6 +86,9 @@ export default {
             productName: "",
             productData: {},
             loading: true,
+            fetchedPDFList: [],
+            largeImage: '',
+            smallImages: []
         }
     },
     computed: {
@@ -103,23 +110,55 @@ export default {
         await this.fetchProductByID();
     },
     methods: {
+        async getImageFromBackend(url) {
+            const res = await $fetch(`${this.apiURL}data/getFileContent`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'accept': "*"
+                },
+                body: JSON.stringify({filename: url})
+            })
+
+            if (res.fileInfo) {
+                return res.fileInfo
+            } else {
+                return url
+            }
+        },
+        openBlob(data) {
+            const binStr = atob( data );
+            const len = binStr.length;
+            const arr = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                arr[ i ] = binStr.charCodeAt( i );
+            }
+            const blob =  new Blob( [ arr ], { type: 'application/pdf' } );
+            const url = URL.createObjectURL( blob );
+            // window.open(url)
+            return url;
+        },
         async fetchProductByID() {
             try {
                 const response = await $fetch(`${this.apiURL}data/product/${this.categoryParam}/${this.param}`)
                 this.productName = response.productData?.productModel
                 this.productData = response.productData
-                this.loading = false;
 
                 const pdfList = this.processPDF(this.productData?.fileTypeVOList);
                 const res = await $fetch(`${this.apiURL}data/product/parsePDF`, {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json',
+                        'accept': "*"
                     },
                     body: JSON.stringify({list: pdfList})
                 })
 
+                this.fetchedPDFList = res.list
 
+                this.largeImage = await this.processToLocal(this.productData.breviaryImageUrl)
+                this.smallImages = await this.processToImgList(this.productData.luceneBreviaryImageUrls)
+                this.loading = false;
             } catch (e) {
                 console.log(e)
             }
@@ -145,16 +184,7 @@ export default {
 
             list && Array.from(list).forEach(item => {
                 if (Array.from(item.detailVOList).length) {
-                    // todo: pdf url process...
                     let url = item.detailVOList[0].fileUrl + "";
-                    // if (url.includes("https://")) {
-                    //     url = url.replace("https://", "")
-                    //     const urlList = url.split("/");
-                    //     urlList.splice(0);
-                    //     url = "D:\\" + urlList.join("/")
-                    // } else {
-                    //     url = "D:\\" + url.split("/").join("/");
-                    // }
                     if (url.includes("https://")) {
                         url = url.replace("https://", "")
                         const urlList = url.split("/");
@@ -166,26 +196,24 @@ export default {
             })
             return retList
         },
-        processToLocal(url) {
+        async processToLocal(url) {
             let _url = url + "";
             
             if (_url.includes("https://")) {
                 _url = _url.replace("https://", "")
-                // console.log('_url1', _url)
                 const urlList = _url.split("/");
-                // console.log('_url2', urlList)
                 urlList.splice(0, 1);
-                // console.log('_url3', urlList)
                 _url = "/" + urlList.join("/")
-                // console.log('_url4', _url)
             }
-            return _url
+            _url = "D:" + _url
+
+            return await this.getImageFromBackend(_url)
         },
-        processToImgList(urls) {
+        async processToImgList(urls) {
             const ret = [];
             const urlList = (urls + "").split("<$>");
             for (let i = 0; i < urlList.length; i++) {
-                ret.push(this.processToLocal(urlList[i]));
+                ret.push(await this.processToLocal(urlList[i]));
             }
             return ret
         },
@@ -194,13 +222,9 @@ export default {
             
             if (_url.includes("https://")) {
                 _url = _url.replace("https://", "")
-                // console.log('_url1', _url)
                 const urlList = _url.split("/");
-                // console.log('_url2', urlList)
                 urlList.splice(0, 1);
-                // console.log('_url3', urlList)
                 _url = "D:/" + urlList.join("/")
-                // console.log('_url4', _url)
             } else {
                 _url = "D:/" + _url
             }
@@ -210,15 +234,11 @@ export default {
             window.open(url, '_blank')
         },
         async copyToClipboard(textToCopy) {
-            // Navigator clipboard api needs a secure context (https)
             if (navigator.clipboard && window.isSecureContext) {
                 await navigator.clipboard.writeText(textToCopy);
             } else {
-                // Use the 'out of viewport hidden text area' trick
                 const textArea = document.createElement("textarea");
                 textArea.value = textToCopy;
-                    
-                // Move textarea out of the viewport so it's not visible
                 textArea.style.position = "absolute";
                 textArea.style.left = "-999999px";
                     

@@ -2,7 +2,10 @@
     <div class="flex w-full flex-col">
         <CommonHeader :title="'Product List(' + totalCount +')'" to="/category"/>
         <hr>
-        <div class="flex w-full flex-col p-[20px]">
+
+        <div class="flex w-full flex-col p-[20px]" v-if="loading">
+        </div>
+        <div class="flex w-full flex-col p-[20px]" v-else>
             <div class="mb-[32px] w-full p-[24px]">
                 <div class="flex h-[320px] w-full overflow-auto ">
                     <div v-for="item, index in paramList" :key="index" class="mr-[8px] flex h-full flex-col border-x bg-white p-[8px]" >
@@ -27,7 +30,7 @@
                 <template #image-data="{ row }">
                     <a href="#" @click="copyToClipboard(processToLocalURL(row.productData?.breviaryImageUrl));">
                         <div class="h-[120px] w-[120px]">
-                            <img v-if="row.productData?.breviaryImageUrl" :src="processToLocal(row.productData?.breviaryImageUrl)" alt="img" class="h-full w-full object-contain">
+                            <img v-if="row.productData?.breviaryImageUrl" :src="'data:image/jpeg;base64,' + row.processedImg" alt="img" class="h-full w-full object-contain">
                             <img v-else src="https://static.szlcsc.com/ecp/assets/web/common/images/productItem/lcpt.jpg" alt="img" class="h-full w-full object-contain">
                         </div>
                     </a>
@@ -160,7 +163,20 @@ export default {
         async page(now) {
             this.loading = true;
             const response = await $fetch(`${this.apiURL}data/list/${this.param}/${this.pageCount}/${now}`)
-            this.contents = response.list;
+            
+            let processed = response.list;
+            
+            for (let i = 0; i < processed.length; i++) {
+                let url = processed[i].productData?.breviaryImageUrl
+                url = this.processToLocal(url)
+                const imgBase64 = await this.getImageFromBackend(url)
+                processed[i].processedImg = imgBase64
+            }
+
+            
+            this.contents = processed;
+            console.log(this.contents)
+
             this.loading = false;
         }
     },
@@ -168,10 +184,37 @@ export default {
         await this.fetchProductsByCategoryID();
     },
     methods: {
+        async getImageFromBackend(url) {
+            const res = await $fetch(`${this.apiURL}data/getFileContent`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'accept': "*"
+                },
+                body: JSON.stringify({filename: url})
+            })
+
+            if (res.fileInfo) {
+                return res.fileInfo
+            } else {
+                return url
+            }
+        },
         async fetchProductsByCategoryID() {
             try {
                 const response = await $fetch(`${this.apiURL}data/list/${this.param}`)
-                this.contents = response.list;
+                let processed = response.list;
+                
+                for (let i = 0; i < processed.length; i++) {
+                    let url = processed[i].productData?.breviaryImageUrl
+                    url = this.processToLocal(url)
+                    const imgBase64 = await this.getImageFromBackend(url)
+                    processed[i].processedImg = imgBase64
+                }
+
+                
+                this.contents = processed;
+                console.log(this.contents)
                 this.totalCount = response.totalCnt;
 
                 this.loading = false;
@@ -215,6 +258,7 @@ export default {
                 _url = "/" + urlList.join("/")
                 // console.log('_url4', _url)
             }
+            _url = "D:" + _url
             return _url
         },
         processToLocalURL(url) {

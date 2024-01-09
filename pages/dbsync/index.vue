@@ -8,7 +8,7 @@
                     <UCheckbox v-model="selected" name="checkall" label="CheckAll" />
                     <UButton id="syncBtn" class="ml-[32px] flex justify-center rounded-[8px] bg-gradient-to-r 
                         from-[#949494A0] to-[#949494A0] px-[24px] py-[12px] text-center" @click="syncProcess()">
-                        Sync DataBase for the selected Product
+                        Step 4. Sync DataBase for the selected Product (after check the items)
                     </UButton>
                     <UButton class="ml-[24px] flex justify-center rounded-[8px] bg-gradient-to-r 
                         from-[#949494A0] to-[#949494A0] px-[24px] py-[12px] text-center" @click="cancelProcess()">
@@ -25,7 +25,7 @@
                         <label class="mb-[12px]">Step1: Construct Original Data</label>
                         <UButton :disabled=originDataStatus class="flex justify-center rounded-[8px] bg-gradient-to-r 
                             from-[#949494A0] to-[#949494A0] px-[24px] py-[12px] text-center" @click="originDataSync">
-                            Sync
+                            Step 1. Sync
                         </UButton>
                     </div>
                     <div class="flex flex-col pt-[24px]">
@@ -40,14 +40,14 @@
                         <label class="mb-[12px]">Step2: Construct DB Tree</label>
                         <UButton :disabled=categoryTreeStatus class="flex justify-center rounded-[8px] bg-gradient-to-r 
                             from-[#949494A0] to-[#949494A0] px-[24px] py-[12px] text-center" @click="catagoryTreeSync">
-                            Construct
+                            Step 2. Construct
                         </UButton>
                     </div>
                     <div class="flex flex-col pt-[24px]">
                         <label class="mb-[12px]">Step3: Sync Filter Parameters</label>
                         <UButton :disabled=filterParamStatus class="flex justify-center rounded-[8px] bg-gradient-to-r 
                             from-[#949494A0] to-[#949494A0] px-[24px] py-[12px] text-center" @click="filterParamSync">
-                            Sync
+                            Step 3. Sync
                         </UButton>
                     </div>
                     <div class="flex flex-col py-[24px]">
@@ -169,6 +169,9 @@ export default {
         },
         entirePercent(now) {
             console.log('entirePercent', now)
+            if (now === 100) {
+                this.cancelProcess()
+            }
         },
         currentStuffProgress(now) {
             console.log('currentStuffProgress', now)

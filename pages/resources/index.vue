@@ -8,7 +8,11 @@
                     <UCheckbox v-model="selected" name="checkall" label="CheckAll" />
                     <UButton id="syncBtn" class="ml-[32px] flex justify-center rounded-[8px] bg-gradient-to-r 
                         from-[#949494A0] to-[#949494A0] px-[24px] py-[12px] text-center" @click="syncProcess()">
-                        Sync Resources for the selected Product
+                        Construct Resources (Init Construct)
+                    </UButton>
+                    <UButton id="reSyncBtn" class="ml-[32px] flex justify-center rounded-[8px] bg-gradient-to-r 
+                        from-[#949494A0] to-[#949494A0] px-[24px] py-[12px] text-center" @click="reSyncProcess()">
+                        Update Resources Process
                     </UButton>
                     <UButton class="ml-[24px] flex justify-center rounded-[8px] bg-gradient-to-r 
                         from-[#949494A0] to-[#949494A0] px-[24px] py-[12px] text-center" @click="cancelProcess()">
@@ -21,8 +25,8 @@
             </div>
             <div class="fixed right-[40px] top-[120px] flex min-w-[400px] basis-3/12 flex-col pl-[24px]">
                 <UContainer class="flex w-full flex-col py-[24px]">
-                    <div class="w-full h-[80px] mb-[16px]" v-show="syncStatus">
-                        <img src="/images/filetransfer.gif" alt="gif" class="w-full h-full object-contain" />
+                    <div v-show="syncStatus" class="mb-[16px] h-[80px] w-full">
+                        <img src="/images/filetransfer.gif" alt="gif" class="h-full w-full object-contain" />
                     </div>
 
                     <UProgress v-show="syncStatus" animation="carousel"/>
@@ -128,6 +132,11 @@ export default {
 
                 await this.$store.dispatch("updateSyncStatus", false)
             }
+        },
+        entirePercent(now) {
+            if (now === 100) {
+                this.cancelProcess();
+            }
         }
     },
     async created() {
@@ -173,18 +182,45 @@ export default {
                 this.$toast.error("Error Occurred during the Process" + err)
             }
         },
+        async reSyncProcess() {
+            const selectedlists = [];
+
+            const elements = document.getElementsByClassName("catalog-select-checkbox");
+            Array.from(elements).forEach(item => {
+                const itemCh = item.getElementsByTagName("input")
+                if (itemCh && itemCh.length > 0) 
+                {
+                    if (itemCh[0].checked) {
+                        selectedlists.push(itemCh[0].getAttribute("name"))
+                    }
+                }
+            })
+
+            if (selectedlists.length === 0) {
+                this.$toast.error("Please Select the Items, and Try again!")
+                return;
+            }
+
+            try {
+                await this.$store.dispatch("startDBSync", {list: selectedlists, type: 'rsc-re-sync'});
+            } catch (err) {
+                this.$toast.error("Error Occurred during the Process" + err)
+            }
+        },
         async cancelProcess() {
             await this.$store.dispatch("pauseDBSync")
         },
         disableProcess(flag) {
             const checkboxs = document.getElementsByTagName("input");
             const syncBtn = document.getElementById("syncBtn");
+            const resyncBtn = document.getElementById("reSyncBtn");
 
             Array.from(checkboxs).forEach(item => {
                 item.disabled = !flag;
             })
 
             syncBtn && (syncBtn.disabled = !flag);
+            resyncBtn && (resyncBtn.disabled = !flag);
         },
     }
 }
