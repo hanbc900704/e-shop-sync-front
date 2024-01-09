@@ -3,9 +3,9 @@
         <CommonHeader :title="'Product List(' + totalCount +')'" to="/category"/>
         <hr>
 
-        <div class="flex w-full flex-col p-[20px]" v-if="loading">
+        <div v-if="loading" class="flex w-full flex-col p-[20px]">
         </div>
-        <div class="flex w-full flex-col p-[20px]" v-else>
+        <div v-else class="flex w-full flex-col p-[20px]">
             <div class="mb-[32px] w-full p-[24px]">
                 <div class="flex h-[320px] w-full overflow-auto ">
                     <div v-for="item, index in paramList" :key="index" class="mr-[8px] flex h-full flex-col border-x bg-white p-[8px]" >
@@ -164,7 +164,7 @@ export default {
             this.loading = true;
             const response = await $fetch(`${this.apiURL}data/list/${this.param}/${this.pageCount}/${now}`)
             
-            let processed = response.list;
+            const processed = response.list;
             
             for (let i = 0; i < processed.length; i++) {
                 let url = processed[i].productData?.breviaryImageUrl
@@ -203,7 +203,7 @@ export default {
         async fetchProductsByCategoryID() {
             try {
                 const response = await $fetch(`${this.apiURL}data/list/${this.param}`)
-                let processed = response.list;
+                const processed = response.list;
                 
                 for (let i = 0; i < processed.length; i++) {
                     let url = processed[i].productData?.breviaryImageUrl
