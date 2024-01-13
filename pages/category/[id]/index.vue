@@ -38,7 +38,7 @@
                 <template #c1-data="{ row }">
                     <div class="flex flex-col">
                         <a :href="'/category/' + param + '/' + row.productData?.productId"><span>{{ row.productData?.productModel }}</span></a>
-                        <div class="flex items-center" v-if="!checkCompany(row.productData?.lightBrandName)">
+                        <div v-if="!checkCompany(row.productData?.lightBrandName)" class="flex items-center">
                             <span>品牌: </span>
                             <span class="ml-1">{{ row.productData?.lightBrandName }}</span>
                         </div>
@@ -265,7 +265,7 @@ export default {
                 _url = "/" + urlList.join("/")
                 // console.log('_url4', _url)
             }
-            _url = "D:" + _url
+            _url = "D:/resources" + _url
             return _url
         },
         processToLocalURL(url) {
@@ -278,10 +278,10 @@ export default {
                 // console.log('_url2', urlList)
                 urlList.splice(0, 1);
                 // console.log('_url3', urlList)
-                _url = "D:/" + urlList.join("/")
+                _url = "D:/resources/" + urlList.join("/")
                 // console.log('_url4', _url)
             } else {
-                _url = "D:/" + _url
+                _url = "D:/resources/" + _url
             }
             // window.location(_url)
             return _url

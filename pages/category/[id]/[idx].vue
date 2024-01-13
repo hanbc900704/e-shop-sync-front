@@ -16,7 +16,7 @@
                         </div>
                     </a>
                     <div class="mt-[12px] flex h-[60px] w-[200px]">
-                        <a v-for="item, index in smallImages" :key="index" href="#" class="mr-[8px]" @click="copyToClipboard('D:/' + item)" >
+                        <a v-for="item, index in smallImages" :key="index" href="#" class="mr-[8px]" @click="copyToClipboard('D:/resources/' + item)" >
                             <img :src="'data:image/jpeg;base64,' + item" alt="img" class="h-[60px] w-[60px] hover:scale-[200%]">
                         </a>
                     </div>
@@ -43,7 +43,7 @@
                     </div>
                 </div>
                 <div class="flex flex-col px-[24px] py-[12px]">
-                    <div class="flex items-center" v-if="!checkCompany(productData?.lightBrandName)">
+                    <div v-if="!checkCompany(productData?.lightBrandName)" class="flex items-center">
                         <span>品牌: </span>
                         <span class="ml-1">{{ productData?.lightBrandName }}</span>
                     </div>
@@ -60,7 +60,7 @@
 
             <div class="flex w-full flex-col">
                 <div v-for="item, index in processPDF(productData?.fileTypeVOList)" :key="index" class="flex w-full flex-col py-[24px]">
-                    <a href="#" @click="copyToClipboard('D:/' + item.url)">
+                    <a href="#" @click="copyToClipboard('D:/resources/' + item.url)">
                         <span>{{ item.name }}</span>
                     </a>
                 </div>
@@ -212,7 +212,7 @@ export default {
                 urlList.splice(0, 1);
                 _url = "/" + urlList.join("/")
             }
-            _url = "D:" + _url
+            _url = "D:/resources" + _url
 
             return await this.getImageFromBackend(_url)
         },
@@ -231,9 +231,9 @@ export default {
                 _url = _url.replace("https://", "")
                 const urlList = _url.split("/");
                 urlList.splice(0, 1);
-                _url = "D:/" + urlList.join("/")
+                _url = "D:/resources/" + urlList.join("/")
             } else {
-                _url = "D:/" + _url
+                _url = "D:/resources/" + _url
             }
             return _url
         },
