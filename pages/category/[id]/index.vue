@@ -38,7 +38,7 @@
                 <template #c1-data="{ row }">
                     <div class="flex flex-col">
                         <a :href="'/category/' + param + '/' + row.productData?.productId"><span>{{ row.productData?.productModel }}</span></a>
-                        <div class="flex items-center">
+                        <div class="flex items-center" v-if="!checkCompany(row.productData?.lightBrandName)">
                             <span>品牌: </span>
                             <span class="ml-1">{{ row.productData?.lightBrandName }}</span>
                         </div>
@@ -184,6 +184,13 @@ export default {
         await this.fetchProductsByCategoryID();
     },
     methods: {
+        checkCompany(name) {
+            const nameStr= String(name).toLowerCase()
+            if (nameStr.includes("samwha") || nameStr.includes("samsung") || nameStr.includes("hynix")) {
+                return true
+            }
+            return false
+        },
         async getImageFromBackend(url) {
             const res = await $fetch(`${this.apiURL}data/getFileContent`, {
                 method: "POST",

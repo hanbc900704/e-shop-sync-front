@@ -43,7 +43,7 @@
                     </div>
                 </div>
                 <div class="flex flex-col px-[24px] py-[12px]">
-                    <div class="flex items-center">
+                    <div class="flex items-center" v-if="!checkCompany(productData?.lightBrandName)">
                         <span>品牌: </span>
                         <span class="ml-1">{{ productData?.lightBrandName }}</span>
                     </div>
@@ -110,6 +110,13 @@ export default {
         await this.fetchProductByID();
     },
     methods: {
+        checkCompany(name) {
+            const nameStr= String(name).toLowerCase()
+            if (nameStr.includes("samwha") || nameStr.includes("samsung") || nameStr.includes("hynix")) {
+                return true
+            }
+            return false
+        },
         async getImageFromBackend(url) {
             const res = await $fetch(`${this.apiURL}data/getFileContent`, {
                 method: "POST",
